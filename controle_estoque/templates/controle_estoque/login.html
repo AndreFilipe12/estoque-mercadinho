@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {% load static %}
+
+    <link
+        rel="stylesheet"
+        href="{% static 'controle_estoque/style.css' %}"
+    >
+
+    <title>CompraFácil - Login</title>
+</head>
+
+<body class="pagina-login">
+
+    <div class="login-wrapper">
+
+        <!-- LADO ESQUERDO -->
+        <div class="login-banner">
+
+            <div class="banner-overlay">
+
+                <div class="marca">
+
+                    <div class="marca-icone">
+                        🛒
+                    </div>
+
+                    <div>
+                        <h1>CompraFácil</h1>
+
+                        <p>
+                            Controle de Estoque
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="banner-texto">
+
+                    <h2>
+                        Mais organização para o seu negócio crescer!
+                    </h2>
+
+                    <span></span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- LADO DIREITO -->
+        <div class="login-form-area">
+
+            <div class="login-form-box">
+
+                <div class="login-form-header">
+
+                    <h2>
+                        Acesse sua conta
+                    </h2>
+
+                    <p>
+                        Digite seu usuário e senha para entrar no sistema.
+                    </p>
+
+                </div>
+
+
+                <form method="POST">
+
+                    {% csrf_token %}
+
+                    {% if form.errors %}
+
+                        <div class="login-erro">
+                            Usuário ou senha inválidos.
+                        </div>
+
+                    {% endif %}
+
+
+                    <div class="login-field">
+
+                        <label for="id_username">
+                            Usuário
+                        </label>
+
+                        <div class="login-input-wrapper">
+
+                            <input
+                                type="text"
+                                name="username"
+                                id="id_username"
+                                placeholder="Digite seu usuário"
+                                autocomplete="username"
+                                required
+                                autofocus
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="login-field">
+
+                        <label for="id_password">
+                            Senha
+                        </label>
+
+                        <div class="login-input-wrapper">
+
+                            <input
+                                type="password"
+                                name="password"
+                                id="id_password"
+                                placeholder="Digite sua senha"
+                                autocomplete="current-password"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+                    <input
+                        type="hidden"
+                        name="next"
+                        value="{{ next }}"
+                    >
+
+
+                    <button
+                        type="submit"
+                        class="btn-login"
+                    >
+                        Entrar
+                        <span>→</span>
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

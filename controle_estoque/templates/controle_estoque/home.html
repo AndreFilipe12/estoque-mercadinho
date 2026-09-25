@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {% load static %}
+
+    <link
+        rel="stylesheet"
+        href="{% static 'controle_estoque/style.css' %}"
+    >
+
+    <title>CompraFácil - Controle de Estoque</title>
+</head>
+
+<body>
+
+    <!-- NOTIFICAÇÕES -->
+
+    {% if messages %}
+
+        <div class="toast-container">
+
+            {% for message in messages %}
+
+                <div class="toast toast-sucesso">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+
+    <!-- CABEÇALHO -->
+
+    <header class="topo-sistema">
+
+        <div class="marca-dashboard">
+
+            <div class="icone-dashboard">
+                🛒
+            </div>
+
+            <div>
+
+                <div class="nome-sistema">
+                    CompraFácil
+                </div>
+
+                <div class="subtitulo-sistema">
+                    Controle de Estoque
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="topo-usuario">
+
+            <span class="usuario-logado">
+
+                Caixa:
+                <strong>
+                    {{ request.user.username }}
+                </strong>
+
+            </span>
+
+            <form
+                method="POST"
+                action="{% url 'logout' %}"
+            >
+
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="btn-logout"
+                >
+                    Sair
+                </button>
+
+            </form>
+
+        </div>
+
+    </header>
+
+
+    <!-- APRESENTAÇÃO -->
+
+    <div class="dashboard-intro">
+
+        <div>
+
+            <h1>
+                Visão geral
+            </h1>
+
+            <p>
+                Acompanhe o estoque da sua loja em um só lugar.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- INDICADORES -->
+
+    <div class="dashboard">
+
+        <div class="card">
+
+            <h3>
+                Total de Produtos
+            </h3>
+
+            <p>
+                {{ total_produtos }}
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                Total de Unidades
+            </h3>
+
+            <p>
+                {{ total_unidades }}
+            </p>
+
+        </div>
+
+
+        <div
+            class="card {% if estoque_baixo > 0 %}card-alerta{% endif %}"
+        >
+
+            <h3>
+                Estoque Baixo
+            </h3>
+
+            <p>
+                {{ estoque_baixo }}
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                Valor Total do Estoque
+            </h3>
+
+            <p>
+                R$ {{ valor_total_estoque|floatformat:2 }}
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- PRODUTOS -->
+
+    <div class="titulo-produtos">
+
+        <div>
+
+            <h2>
+                Produtos cadastrados
+            </h2>
+
+            <p>
+                Consulte, edite e movimente os produtos da loja.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- BARRA DE AÇÕES -->
+
+    <div class="barra-acoes">
+
+        <form
+            method="GET"
+            class="form-busca"
+        >
+
+            <input
+                type="text"
+                name="busca"
+                value="{{ busca }}"
+                placeholder="Buscar por nome, código ou categoria"
+            >
+
+
+            <select name="categoria">
+
+                <option value="">
+                    Todas as categorias
+                </option>
+
+
+                {% for item in categorias %}
+
+                    <option
+                        value="{{ item }}"
+                        {% if categoria == item %}selected{% endif %}
+                    >
+                        {{ item }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+
+            <button type="submit">
+                🔎 Buscar
+            </button>
+
+
+            {% if busca or categoria %}
+
+                <a href="{% url 'home' %}">
+                    Limpar
+                </a>
+
+            {% endif %}
+
+        </form>
+
+
+        <div class="acoes-principais">
+
+            <a href="{% url 'novo_produto' %}">
+
+                <button type="button">
+                    + Novo Produto
+                </button>
+
+            </a>
+
+
+            <a href="{% url 'historico_movimentacoes' %}">
+
+                <button
+                    type="button"
+                    class="btn-historico"
+                >
+                    Histórico
+                </button>
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- TABELA -->
+
+    <div class="tabela-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Nome
+                    </th>
+
+                    <th>
+                        Código
+                    </th>
+
+                    <th>
+                        Categoria
+                    </th>
+
+                    <th>
+                        Preço
+                    </th>
+
+                    <th>
+                        Quantidade
+                    </th>
+
+                    <th>
+                        Estoque mínimo
+                    </th>
+
+                    <th>
+                        Ações
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for produto in produtos %}
+
+                    <tr
+                        class="{% if produto.quantidade_estoque <= produto.estoque_minimo %}estoque-baixo{% endif %}"
+                    >
+
+                        <td>
+                            {{ produto.nome }}
+                        </td>
+
+
+                        <td>
+                            {{ produto.codigo }}
+                        </td>
+
+
+                        <td>
+                            {{ produto.categoria }}
+                        </td>
+
+
+                        <td>
+                            R$ {{ produto.preco|floatformat:2 }}
+                        </td>
+
+
+                        <td>
+                            {{ produto.quantidade_estoque }}
+                        </td>
+
+
+                        <td>
+                            {{ produto.estoque_minimo }}
+                        </td>
+
+
+                        <td class="acoes">
+
+                            <a
+                                href="{% url 'movimentar_estoque' produto.id %}"
+                                class="btn-movimentar"
+                            >
+                                Movimentar
+                            </a>
+
+
+                            <a
+                                href="{% url 'editar_produto' produto.id %}"
+                                class="btn-editar"
+                            >
+                                Editar
+                            </a>
+
+
+                            <form
+                                method="POST"
+                                action="{% url 'excluir_produto' produto.id %}"
+                            >
+
+                                {% csrf_token %}
+
+                                <button
+                                    type="submit"
+                                    class="btn-excluir"
+                                    onclick="return confirm('Tem certeza que deseja excluir este produto?')"
+                                >
+                                    Excluir
+                                </button>
+
+                            </form>
+
+                        </td>
+
+                    </tr>
+
+
+                {% empty %}
+
+                    <tr>
+
+                        <td colspan="7">
+
+                            Nenhum produto encontrado.
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- PAGINAÇÃO -->
+
+    {% if pagina_obj.has_other_pages %}
+
+        <div class="paginacao">
+
+            {% if pagina_obj.has_previous %}
+
+                <a
+                    href="?pagina={{ pagina_obj.previous_page_number }}{% if busca %}&busca={{ busca|urlencode }}{% endif %}{% if categoria %}&categoria={{ categoria|urlencode }}{% endif %}"
+                >
+                    ←
+                </a>
+
+            {% endif %}
+
+
+            {% for numero in pagina_obj.paginator.page_range %}
+
+                {% if numero == pagina_obj.number %}
+
+                    <span class="pagina-atual">
+                        {{ numero }}
+                    </span>
+
+                {% else %}
+
+                    <a
+                        href="?pagina={{ numero }}{% if busca %}&busca={{ busca|urlencode }}{% endif %}{% if categoria %}&categoria={{ categoria|urlencode }}{% endif %}"
+                    >
+                        {{ numero }}
+                    </a>
+
+                {% endif %}
+
+            {% endfor %}
+
+
+            {% if pagina_obj.has_next %}
+
+                <a
+                    href="?pagina={{ pagina_obj.next_page_number }}{% if busca %}&busca={{ busca|urlencode }}{% endif %}{% if categoria %}&categoria={{ categoria|urlencode }}{% endif %}"
+                >
+                    →
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    {% endif %}
+
+
+    <!-- JAVASCRIPT DA NOTIFICAÇÃO -->
+
+    <script>
+
+        setTimeout(function () {
+
+            const toasts =
+                document.querySelectorAll('.toast');
+
+            toasts.forEach(function (toast) {
+
+                toast.classList.add('toast-saindo');
+
+                setTimeout(function () {
+
+                    toast.remove();
+
+                }, 500);
+
+            });
+
+        }, 2500);
+
+    </script>
+
+</body>
+
+</html>

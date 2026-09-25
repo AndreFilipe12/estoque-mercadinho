@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {% load static %}
+
+    <link
+        rel="stylesheet"
+        href="{% static 'controle_estoque/style.css' %}"
+    >
+
+    <title>CompraFácil - Novo Produto</title>
+</head>
+
+<body>
+
+    <div class="produto-page">
+
+        <!-- CABEÇALHO -->
+
+        <div class="produto-page-header">
+
+            <div>
+                <div class="produto-breadcrumb">
+                    CompraFácil / Estoque / Novo produto
+                </div>
+
+                <h1>
+                    Novo produto
+                </h1>
+
+                <p>
+                    Cadastre um novo produto no estoque da loja.
+                </p>
+            </div>
+
+            <a
+                href="{% url 'home' %}"
+                class="btn-voltar-produto"
+            >
+                ← Voltar ao estoque
+            </a>
+
+        </div>
+
+
+        <!-- FORMULÁRIO -->
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="form-errors">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+
+            <!-- DADOS DO PRODUTO -->
+
+            <div class="produto-section">
+
+                <div class="produto-section-header">
+
+                    <div class="produto-section-icon">
+                        🛒
+                    </div>
+
+                    <div>
+                        <h2>
+                            Dados do produto
+                        </h2>
+
+                        <p>
+                            Informações básicas para identificação do item.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="produto-grid">
+
+                    <div class="produto-field produto-field-full">
+
+                        <label for="{{ form.nome.id_for_label }}">
+                            {{ form.nome.label }}
+                        </label>
+
+                        {{ form.nome }}
+
+                        {% if form.nome.errors %}
+                            <div class="campo-erro">
+                                {{ form.nome.errors }}
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="produto-field">
+
+                        <label for="{{ form.codigo.id_for_label }}">
+                            {{ form.codigo.label }}
+                        </label>
+
+                        {{ form.codigo }}
+
+                        {% if form.codigo.errors %}
+                            <div class="campo-erro">
+                                {{ form.codigo.errors }}
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="produto-field">
+
+                        <label for="{{ form.categoria.id_for_label }}">
+                            {{ form.categoria.label }}
+                        </label>
+
+                        {{ form.categoria }}
+
+                        {% if form.categoria.errors %}
+                            <div class="campo-erro">
+                                {{ form.categoria.errors }}
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ESTOQUE -->
+
+            <div class="produto-section">
+
+                <div class="produto-section-header">
+
+                    <div class="produto-section-icon">
+                        📦
+                    </div>
+
+                    <div>
+                        <h2>
+                            Informações de estoque
+                        </h2>
+
+                        <p>
+                            Defina o preço e as quantidades do produto.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="produto-grid">
+
+                    <div class="produto-field">
+
+                        <label for="{{ form.preco.id_for_label }}">
+                            {{ form.preco.label }}
+                        </label>
+
+                        <div class="campo-prefixo">
+                            <span>
+                                R$
+                            </span>
+
+                            {{ form.preco }}
+                        </div>
+
+                        {% if form.preco.errors %}
+                            <div class="campo-erro">
+                                {{ form.preco.errors }}
+                            </div>
+                        {% endif %}
+
+                        <small>
+                            Exemplo: 4.277,04
+                        </small>
+
+                    </div>
+
+
+                    <div class="produto-field">
+
+                        <label for="{{ form.quantidade_estoque.id_for_label }}">
+                            {{ form.quantidade_estoque.label }}
+                        </label>
+
+                        {{ form.quantidade_estoque }}
+
+                        {% if form.quantidade_estoque.errors %}
+                            <div class="campo-erro">
+                                {{ form.quantidade_estoque.errors }}
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="produto-field">
+
+                        <label for="{{ form.estoque_minimo.id_for_label }}">
+                            {{ form.estoque_minimo.label }}
+                        </label>
+
+                        {{ form.estoque_minimo }}
+
+                        {% if form.estoque_minimo.errors %}
+                            <div class="campo-erro">
+                                {{ form.estoque_minimo.errors }}
+                            </div>
+                        {% endif %}
+
+                        <small>
+                            O sistema avisará quando o estoque chegar a este valor.
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- AÇÕES -->
+
+            <div class="produto-form-footer">
+
+                <a
+                    href="{% url 'home' %}"
+                    class="btn-cancelar-produto"
+                >
+                    Cancelar
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn-salvar-produto"
+                >
+                    ✓ Cadastrar produto
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {% load static %}
+
+    <link
+        rel="stylesheet"
+        href="{% static 'controle_estoque/style.css' %}"
+    >
+
+    <title>CompraFácil - Movimentar Estoque</title>
+</head>
+
+<body>
+
+    <div class="produto-page">
+
+        <!-- CABEÇALHO -->
+
+        <div class="produto-page-header">
+
+            <div>
+
+                <div class="produto-breadcrumb">
+                    CompraFácil / Estoque / Movimentar
+                </div>
+
+                <h1>
+                    Movimentar estoque
+                </h1>
+
+                <p>
+                    Registre uma entrada ou saída de estoque.
+                </p>
+
+            </div>
+
+            <a
+                href="{% url 'home' %}"
+                class="btn-voltar-produto"
+            >
+                ← Voltar ao estoque
+            </a>
+
+        </div>
+
+
+        <!-- PRODUTO -->
+
+        <div class="movimentacao-produto-card">
+
+            <div class="movimentacao-produto-icon">
+                📦
+            </div>
+
+            <div class="movimentacao-produto-info">
+
+                <div class="movimentacao-produto-label">
+                    Produto selecionado
+                </div>
+
+                <h2>
+                    {{ produto.nome }}
+                </h2>
+
+                <div class="movimentacao-produto-detalhes">
+
+                    <span>
+                        Código:
+                        <strong>{{ produto.codigo }}</strong>
+                    </span>
+
+                    <span>
+                        Categoria:
+                        <strong>{{ produto.categoria }}</strong>
+                    </span>
+
+                    <span>
+                        Estoque atual:
+                        <strong>{{ produto.quantidade_estoque }} unidades</strong>
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- FORMULÁRIO -->
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <!-- Mantém o produto selecionado no formulário -->
+            <input
+                type="hidden"
+                name="produto"
+                value="{{ produto.id }}"
+            >
+
+            {% if form.non_field_errors %}
+
+                <div class="form-errors">
+                    {{ form.non_field_errors }}
+                </div>
+
+            {% endif %}
+
+
+            <div class="produto-section">
+
+                <div class="produto-section-header">
+
+                    <div class="produto-section-icon">
+                        🔄
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Dados da movimentação
+                        </h2>
+
+                        <p>
+                            Informe o tipo e a quantidade da operação.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="movimentacao-grid">
+
+                    <!-- TIPO -->
+
+                    <div class="produto-field">
+
+                        <label for="{{ form.tipo.id_for_label }}">
+                            {{ form.tipo.label }}
+                        </label>
+
+                        {{ form.tipo }}
+
+                        {% if form.tipo.errors %}
+
+                            <div class="campo-erro">
+                                {{ form.tipo.errors }}
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- QUANTIDADE -->
+
+                    <div class="produto-field">
+
+                        <label for="{{ form.quantidade.id_for_label }}">
+                            {{ form.quantidade.label }}
+                        </label>
+
+                        {{ form.quantidade }}
+
+                        {% if form.quantidade.errors %}
+
+                            <div class="campo-erro">
+                                {{ form.quantidade.errors }}
+                            </div>
+
+                        {% endif %}
+
+                        <small>
+                            A quantidade deve ser maior que zero.
+                        </small>
+
+                    </div>
+
+
+                    <!-- OBSERVAÇÃO -->
+
+                    <div class="produto-field movimentacao-observacao">
+
+                        <label for="{{ form.observacao.id_for_label }}">
+                            {{ form.observacao.label }}
+                        </label>
+
+                        {{ form.observacao }}
+
+                        {% if form.observacao.errors %}
+
+                            <div class="campo-erro">
+                                {{ form.observacao.errors }}
+                            </div>
+
+                        {% endif %}
+
+                        <small>
+                            Exemplo: compra de mercadoria, venda, reposição...
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- AÇÕES -->
+
+            <div class="produto-form-footer">
+
+                <a
+                    href="{% url 'home' %}"
+                    class="btn-cancelar-produto"
+                >
+                    Cancelar
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn-salvar-produto"
+                >
+                    ✓ Registrar movimentação
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</body>
+
+</html>

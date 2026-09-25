@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {% load static %}
+
+    <link
+        rel="stylesheet"
+        href="{% static 'controle_estoque/style.css' %}"
+    >
+
+    <title>CompraFácil - Histórico</title>
+</head>
+
+<body>
+
+    <div class="historico-page">
+
+        <!-- CABEÇALHO -->
+
+        <div class="historico-page-header">
+
+            <div>
+
+                <div class="historico-breadcrumb">
+                    CompraFácil / Estoque / Histórico
+                </div>
+
+                <h1>
+                    Histórico de movimentações
+                </h1>
+
+                <p>
+                    Consulte todas as entradas e saídas realizadas no estoque.
+                </p>
+
+            </div>
+
+            <a
+                href="{% url 'home' %}"
+                class="btn-voltar-produto"
+            >
+                ← Voltar ao estoque
+            </a>
+
+        </div>
+
+
+        <!-- FILTROS -->
+
+        <div class="historico-filtros">
+
+            <div class="historico-section-header">
+
+                <div class="historico-section-icon">
+                    🔎
+                </div>
+
+                <div>
+
+                    <h2>
+                        Filtros
+                    </h2>
+
+                    <p>
+                        Refine a busca para encontrar movimentações específicas.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <form method="GET">
+
+                <!-- PRODUTO -->
+
+                <div class="historico-filtro-produto">
+
+                    <label for="produto">
+                        Produto
+                    </label>
+
+                    <select
+                        name="produto"
+                        id="produto"
+                    >
+
+                        <option value="">
+                            Todos os produtos
+                        </option>
+
+                        {% for produto in produtos_historico %}
+
+                            <option
+                                value="{{ produto.id }}"
+                                {% if produto_id == produto.id|stringformat:"s" %}selected{% endif %}
+                            >
+                                {{ produto.nome }} - {{ produto.codigo }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- TIPO E DATA -->
+
+                <div class="historico-filtros-grid">
+
+                    <div class="historico-campo">
+
+                        <label for="tipo">
+                            Tipo de movimentação
+                        </label>
+
+                        <select
+                            name="tipo"
+                            id="tipo"
+                        >
+
+                            <option value="">
+                                Todas as movimentações
+                            </option>
+
+                            <option
+                                value="entrada"
+                                {% if tipo == 'entrada' %}selected{% endif %}
+                            >
+                                Entradas
+                            </option>
+
+                            <option
+                                value="saida"
+                                {% if tipo == 'saida' %}selected{% endif %}
+                            >
+                                Saídas
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="historico-campo">
+
+                        <label for="data_inicio">
+                            Data inicial
+                        </label>
+
+                        <input
+                            type="date"
+                            name="data_inicio"
+                            id="data_inicio"
+                            value="{{ data_inicio }}"
+                        >
+
+                    </div>
+
+
+                    <div class="historico-campo">
+
+                        <label for="data_fim">
+                            Data final
+                        </label>
+
+                        <input
+                            type="date"
+                            name="data_fim"
+                            id="data_fim"
+                            value="{{ data_fim }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- AÇÕES -->
+
+                <div class="historico-filtros-acoes">
+
+                    <button
+                        type="submit"
+                        class="btn-filtrar-historico"
+                    >
+                        🔎 Aplicar filtros
+                    </button>
+
+
+                    {% if tipo or produto_id or data_inicio or data_fim %}
+
+                        <a
+                            href="{% url 'historico_movimentacoes' %}"
+                            class="btn-limpar-historico"
+                        >
+                            Limpar filtros
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+            </form>
+
+        </div>
+
+
+        <!-- RESUMO -->
+
+        <div class="historico-resumo">
+
+            <div class="historico-resumo-card">
+
+                <div class="historico-resumo-label">
+                    Movimentações
+                </div>
+
+                <div class="historico-resumo-valor">
+                    {{ total_movimentacoes }}
+                </div>
+
+            </div>
+
+
+            <div class="historico-resumo-card entrada">
+
+                <div class="historico-resumo-label">
+                    Entradas
+                </div>
+
+                <div class="historico-resumo-valor">
+                    {{ total_entradas }}
+                </div>
+
+            </div>
+
+
+            <div class="historico-resumo-card saida">
+
+                <div class="historico-resumo-label">
+                    Saídas
+                </div>
+
+                <div class="historico-resumo-valor">
+                    {{ total_saidas }}
+                </div>
+
+            </div>
+
+
+            <div class="historico-resumo-card">
+
+                <div class="historico-resumo-label">
+                    Quantidade movimentada
+                </div>
+
+                <div class="historico-resumo-valor">
+                    {{ quantidade_movimentada }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- TABELA -->
+
+        <div class="historico-tabela-box">
+
+            <div class="historico-tabela-header">
+
+                <div>
+
+                    <h2>
+                        Movimentações
+                    </h2>
+
+                    <p>
+                        Registro das operações realizadas no estoque.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="historico-tabela-scroll">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Data
+                            </th>
+
+                            <th>
+                                Produto
+                            </th>
+
+                            <th>
+                                Código
+                            </th>
+
+                            <th>
+                                Tipo
+                            </th>
+
+                            <th>
+                                Quantidade
+                            </th>
+
+                            <th>
+                                Observação
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for movimentacao in movimentacoes %}
+
+                            <tr>
+
+                                <td>
+                                    {{ movimentacao.data_movimentacao|date:"d/m/Y H:i" }}
+                                </td>
+
+                                <td class="historico-produto">
+
+                                    <strong>
+                                        {{ movimentacao.produto.nome }}
+                                    </strong>
+
+                                </td>
+
+                                <td>
+                                    {{ movimentacao.produto.codigo }}
+                                </td>
+
+                                <td>
+
+                                    {% if movimentacao.tipo == 'entrada' %}
+
+                                        <span class="badge-entrada">
+                                            Entrada
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge-saida">
+                                            Saída
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td class="historico-quantidade">
+
+                                    {% if movimentacao.tipo == 'entrada' %}
+                                        +{{ movimentacao.quantidade }}
+                                    {% else %}
+                                        -{{ movimentacao.quantidade }}
+                                    {% endif %}
+
+                                </td>
+
+                                <td>
+                                    {{ movimentacao.observacao|default:"Sem observação" }}
+                                </td>
+
+                            </tr>
+
+
+                        {% empty %}
+
+                            <tr>
+
+                                <td
+                                    colspan="6"
+                                    class="historico-vazio"
+                                >
+                                    <strong>
+                                        Nenhuma movimentação encontrada
+                                    </strong>
+
+                                    <span>
+                                        Tente alterar os filtros utilizados.
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
